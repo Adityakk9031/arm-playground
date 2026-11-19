@@ -1,0 +1,9 @@
+[project]
+name = "arm-playground"
+version = "0.1.0"
+description = "60-day Physical AI challenge, Project 1: robot arm in MuJoCo"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "mujoco",
+    "numpy",
+]
