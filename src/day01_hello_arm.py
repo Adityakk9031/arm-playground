@@ -45,12 +45,14 @@ def make_controller(model, home_ctrl):
     """Return ctrl_at(t): a full ctrl vector of sine waves centered on the home pose."""
     lo, hi = model.actuator_ctrlrange[:, 0], model.actuator_ctrlrange[:, 1]
     # Shrink each amplitude so center +/- amp stays inside the actuator's ctrl range,
-    # with 10% margin. Elbow home (-1.57) sits near its upper limit (-0.07), so it
-    # gets clamped; this is why we compute amplitudes instead of hard-coding them.
+    # with 10% margin. The clamp only activates when the requested amplitude exceeds
+    # 90% of the room to the nearer joint limit. Elbow: home -1.57, range -3.07..-0.07,
+    # room 1.5, cap 1.35, so 0.6 passes unchanged but requesting 3.0 gets capped to ~1.35.
     amps = {}
     for i, (_, amp) in WIGGLE.items():
         room = min(hi[i] - home_ctrl[i], home_ctrl[i] - lo[i])
         amps[i] = min(amp, 0.9 * room)
+    print("amplitudes:", amps)
 
     def ctrl_at(t):
         ctrl = home_ctrl.copy()  # joints we don't wiggle hold their home target
